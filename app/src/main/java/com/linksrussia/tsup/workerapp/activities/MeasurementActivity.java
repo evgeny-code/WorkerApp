@@ -36,7 +36,7 @@ public class MeasurementActivity extends AppCompatActivity {
 
     public static final DialogUtil DIALOG_UTIL = new DialogUtil();
 
-    final MeasureDao measureDao = App.getAppDatabase().measureDao();
+    final MeasureDao measureDao = App.db.measureDao();
     final List<View> renderedRows = new ArrayList<>();
 
     private DataReceiver dataReceiver;
@@ -47,7 +47,6 @@ public class MeasurementActivity extends AppCompatActivity {
             LayoutInflater layoutInflater = getLayoutInflater();
             TableLayout measurementDataLayout = findViewById(R.id.measurementDataLayout);
 
-            // measurementDataLayout.removeAllViews();
             renderedRows.forEach(view -> measurementDataLayout.removeView(view));
             renderedRows.clear();
 
@@ -92,9 +91,9 @@ public class MeasurementActivity extends AppCompatActivity {
         });
 
         ES.restartReceiveData();
-        BluetoothDevice selectedDevice = App.getApplicationScope().selectedDevice;
+        BluetoothDevice selectedDevice = App.selectedDevice;
 
-        if (null == selectedDevice) {
+        if (!App.isDeviceConnected()) {
             DIALOG_UTIL.onCreateNoDeviceForkDialog(this).show();
         } else {
             Snackbar.make(findViewById(R.id.measurementDataLayout),

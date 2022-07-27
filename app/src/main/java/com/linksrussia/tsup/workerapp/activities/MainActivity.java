@@ -21,8 +21,8 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
     public static final Random RANDOM = new Random(System.currentTimeMillis());
 
-    private final MeasureDao measureDao = App.getAppDatabase().measureDao();
-    private final SeriesDao seriesDao = App.getAppDatabase().seriesDao();
+    private final MeasureDao measureDao = App.db.measureDao();
+    private final SeriesDao seriesDao = App.db.seriesDao();
 
     @SuppressLint("MissingPermission")
     @Override
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.measurementBtn).setOnClickListener(this::measurementClick);
         // findViewById(R.id.generateBtn).setOnClickListener(this::generateClick);
 
-        BluetoothDevice selectedDevice = App.getApplicationScope().selectedDevice;
+        BluetoothDevice selectedDevice = App.selectedDevice;
         if (null != selectedDevice) {
             Snackbar.make(findViewById(R.id.selectDeviceBtn),
                             String.format("Вы выбрали прибор %s [%s]", selectedDevice.getName(), selectedDevice.getAddress()),

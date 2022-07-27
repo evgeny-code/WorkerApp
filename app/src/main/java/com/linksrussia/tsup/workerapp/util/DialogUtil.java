@@ -36,7 +36,7 @@ public class DialogUtil {
     }
 
     public Dialog onCreateAddSeriesDialog(SeriesActivity activity) {
-        final SeriesDao seriesDao = App.getAppDatabase().seriesDao();
+        final SeriesDao seriesDao = App.db.seriesDao();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         // Get the layout inflater

@@ -29,25 +29,25 @@ public class ES {
 
     public static void infoToast(String text) {
         Log.e("infoToast", text);
-        App.getAppContext().sendBroadcast(new Intent(InfoMessageReceiver.INTENT_ACTION).putExtra(InfoMessageReceiver.TEXT_EXTRA, text));
+        App.context.sendBroadcast(new Intent(InfoMessageReceiver.INTENT_ACTION).putExtra(InfoMessageReceiver.TEXT_EXTRA, text));
     }
 
     public static void restartReceiveData() {
         stopReceiveData();
 
-        BluetoothDevice selectedDevice = App.getApplicationScope().selectedDevice;
+        BluetoothDevice selectedDevice = App.selectedDevice;
         ES.DEVICE_DATA_FUTURE = ES.DEVICE_EXECUTOR.submit(() -> {
             Thread currentThread = Thread.currentThread();
             while (true) {
                 BluetoothSocket bluetoothSocket = DeviceSessionWorker.getConnectedSocket(selectedDevice);
                 if (null == bluetoothSocket) {
                     infoToast("Не могу подключиться к прибору");
-                    App.getApplicationScope().deviceConnected = false;
+                    App.deviceConnected = false;
                     break;
                 }
 
-                App.getApplicationScope().deviceConnected = true;
-                App.getAppContext().sendBroadcast(new Intent(DeviceReceiver.INTENT_ACTION));
+                App.deviceConnected = true;
+                App.context.sendBroadcast(new Intent(DeviceReceiver.INTENT_ACTION));
 
                 try {
                     DeviceSessionWorker.receiveData(bluetoothSocket, data -> ES.DATA_PARSER.putData(data.trim()));
@@ -70,7 +70,7 @@ public class ES {
                     Log.i("DATA", data.toString());
 
                     data.stream().forEach(dd -> {
-                        App.getAppContext().sendBroadcast(new Intent(DataReceiver.INTENT_ACTION).putExtra(DataReceiver.DATA_EXTRA, GSON.toJson(dd)));
+                        App.context.sendBroadcast(new Intent(DataReceiver.INTENT_ACTION).putExtra(DataReceiver.DATA_EXTRA, GSON.toJson(dd)));
                     });
                 }
 

@@ -21,7 +21,7 @@ public class DataReceiver extends BroadcastReceiver {
     private final long currentSeriesId;
     private final Consumer<List<Measure>> renderCallback;
 
-    final MeasureDao measureDao = App.getAppDatabase().measureDao();
+    final MeasureDao measureDao = App.db.measureDao();
 
     public DataReceiver(long currentSeriesId, Consumer<List<Measure>> renderCallback) {
         this.currentSeriesId = currentSeriesId;

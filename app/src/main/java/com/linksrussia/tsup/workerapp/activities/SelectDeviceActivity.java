@@ -45,20 +45,19 @@ public class SelectDeviceActivity extends AppCompatActivity {
             LayoutInflater layoutInflater = getLayoutInflater();
             layout.removeAllViews();
 
-            BluetoothDevice selectedDevice = App.getApplicationScope().selectedDevice;
+            BluetoothDevice selectedDevice = App.selectedDevice;
             deviceMap.forEach((name, bluetoothDeviceWrapper) -> {
                 View inflate = layoutInflater.inflate(R.layout.item_device, layout, false);
                 ((TextView) inflate.findViewById(R.id.deviceName)).setText(bluetoothDeviceWrapper.getName());
                 ((TextView) inflate.findViewById(R.id.deviceAddress)).setText(bluetoothDeviceWrapper.device.getAddress());
                 inflate.setOnClickListener(v -> {
-                    App.getApplicationScope().selectedDevice = bluetoothDeviceWrapper.device;
+                    App.selectedDevice = bluetoothDeviceWrapper.device;
                     Toast.makeText(SelectDeviceActivity.this, "Пытаемся подключиться к прибору", Toast.LENGTH_SHORT).show();
                     ES.restartReceiveData();
                     this.accept(deviceMap);
                 });
 
-                if (null != selectedDevice
-                        && App.getApplicationScope().deviceConnected
+                if (App.isDeviceConnected()
                         && bluetoothDeviceWrapper.device.getAddress().equals(selectedDevice.getAddress()))
                     ((CheckBox) inflate.findViewById(R.id.checkBox)).setChecked(true);
 

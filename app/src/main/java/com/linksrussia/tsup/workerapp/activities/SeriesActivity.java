@@ -24,8 +24,8 @@ import com.linksrussia.tsup.workerapp.util.ShareUtil;
 public class SeriesActivity extends AppCompatActivity {
     public static final DialogUtil DIALOG_UTIL = new DialogUtil();
 
-    private final SeriesDao seriesDao = App.getAppDatabase().seriesDao();
-    private final MeasureDao measureDao = App.getAppDatabase().measureDao();
+    private final SeriesDao seriesDao = App.db.seriesDao();
+    private final MeasureDao measureDao = App.db.measureDao();
 
     @SuppressLint("MissingPermission")
     @Override

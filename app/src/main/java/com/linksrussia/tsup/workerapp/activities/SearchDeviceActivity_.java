@@ -114,19 +114,18 @@ public class SearchDeviceActivity_ extends AppCompatActivity {
         LayoutInflater layoutInflater = getLayoutInflater();
         layout.removeAllViews();
 
-        BluetoothDevice selectedDevice = App.getApplicationScope().selectedDevice;
+        BluetoothDevice selectedDevice = App.selectedDevice;
         deviceMap.forEach((name, bluetoothDeviceWrapper) -> {
             View inflate = layoutInflater.inflate(R.layout.item_device, layout, false);
             ((TextView) inflate.findViewById(R.id.deviceName)).setText(bluetoothDeviceWrapper.getName());
             ((TextView) inflate.findViewById(R.id.deviceAddress)).setText(bluetoothDeviceWrapper.device.getAddress());
             inflate.setOnClickListener(v -> {
-                App.getApplicationScope().selectedDevice = bluetoothDeviceWrapper.device;
+                App.selectedDevice = bluetoothDeviceWrapper.device;
                 ES.restartReceiveData();
                 renderDevices(layout, deviceMap);
             });
 
-            if (null != selectedDevice
-                    && App.getApplicationScope().deviceConnected
+            if (App.isDeviceConnected()
                     && bluetoothDeviceWrapper.device.getAddress().equals(selectedDevice.getAddress()))
                 ((CheckBox) inflate.findViewById(R.id.checkBox)).setChecked(true);
 
@@ -151,7 +150,7 @@ public class SearchDeviceActivity_ extends AppCompatActivity {
 
         unregisterReceiver(infoMessageReceiver);
 
-       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             bluetoothLeScanner.stopScan(scanCallback);
         } else {
             bluetoothAdapter.stopLeScan(leScanCallback);
