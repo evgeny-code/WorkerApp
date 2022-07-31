@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -89,6 +90,10 @@ public class SelectDeviceActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Все необходимые разрешения у приложения есть", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.searchButton).setOnClickListener(v -> {
+            startActivity(new Intent(this, SearchDeviceActivity.class));
         });
 
         for (BluetoothDevice bondedDevice : bluetoothAdapter.getBondedDevices()) {

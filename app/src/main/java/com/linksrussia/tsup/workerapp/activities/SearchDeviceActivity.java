@@ -29,15 +29,16 @@ import com.linksrussia.tsup.workerapp.R;
 import com.linksrussia.tsup.workerapp.dto.BluetoothDeviceWrapper;
 import com.linksrussia.tsup.workerapp.receivers.InfoMessageReceiver;
 import com.linksrussia.tsup.workerapp.util.BleUtil;
-import com.linksrussia.tsup.workerapp.util.ES;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SearchDeviceActivity_ extends AppCompatActivity {
+public class SearchDeviceActivity extends AppCompatActivity {
+
     public static final int ACCESS_COARSE_LOCATION_CODE = 44;
     public static final int ACCESS_FINE_LOCATION_CODE = 55;
 
@@ -93,7 +94,7 @@ public class SearchDeviceActivity_ extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_device);
+        setContentView(R.layout.activity_search_device);
 
         registerReceiver(infoMessageReceiver, new IntentFilter(InfoMessageReceiver.INTENT_ACTION));
 
@@ -120,9 +121,9 @@ public class SearchDeviceActivity_ extends AppCompatActivity {
             ((TextView) inflate.findViewById(R.id.deviceName)).setText(bluetoothDeviceWrapper.getName());
             ((TextView) inflate.findViewById(R.id.deviceAddress)).setText(bluetoothDeviceWrapper.device.getAddress());
             inflate.setOnClickListener(v -> {
-                App.selectedDevice = bluetoothDeviceWrapper.device;
-                ES.restartReceiveData();
-                renderDevices(layout, deviceMap);
+                bluetoothDeviceWrapper.device.setPin("1234".getBytes(StandardCharsets.UTF_8));
+                boolean bond = bluetoothDeviceWrapper.device.createBond();
+                Log.i("bond", "bond result = " + bond);
             });
 
             if (App.isDeviceConnected()
@@ -158,8 +159,8 @@ public class SearchDeviceActivity_ extends AppCompatActivity {
     }
 
     private boolean checkOrRequest(String permission, int requestCode) {
-        if (ActivityCompat.checkSelfPermission(SearchDeviceActivity_.this, permission) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(SearchDeviceActivity_.this, new String[]{permission}, requestCode);
+        if (ActivityCompat.checkSelfPermission(SearchDeviceActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(SearchDeviceActivity.this, new String[]{permission}, requestCode);
             return false;
         }
 
