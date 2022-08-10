@@ -22,7 +22,7 @@
                 android:id="@+id/measurementName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ICC Ranking of Players:"
+                android:text="XXX:"
                 android:textSize="20dp"
                 android:textStyle="bold"></TextView>
 
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="3sp"
-                    android:text="CG"
+                    android:text="Возвышение (мм)"
                     android:textStyle="bold" />
 
                 <TextView
@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="3sp"
-                    android:text="GJ"
+                    android:text="Расстояние (мм)"
                     android:textStyle="bold" />
             </TableRow>
 

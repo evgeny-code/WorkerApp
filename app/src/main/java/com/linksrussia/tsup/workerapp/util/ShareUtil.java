@@ -27,8 +27,8 @@ public class ShareUtil {
 
         csvBuffer.append("ID;");
         csvBuffer.append("Дата и время;");
-        csvBuffer.append("CG;");
-        csvBuffer.append("GJ;");
+        csvBuffer.append("Возвышение (мм);");
+        csvBuffer.append("Расстояние (мм);");
         csvBuffer.append('\n');
 
         for (Measure measure : measures) {
