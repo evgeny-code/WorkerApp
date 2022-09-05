@@ -25,6 +25,7 @@ import com.linksrussia.tsup.workerapp.R;
 import com.linksrussia.tsup.workerapp.dto.BluetoothDeviceWrapper;
 import com.linksrussia.tsup.workerapp.receivers.DeviceReceiver;
 import com.linksrussia.tsup.workerapp.receivers.InfoMessageReceiver;
+import com.linksrussia.tsup.workerapp.util.DialogUtil;
 import com.linksrussia.tsup.workerapp.util.ES;
 
 import java.util.Arrays;
@@ -36,6 +37,8 @@ public class SelectDeviceActivity extends AppCompatActivity {
     public static final int ACCESS_COARSE_LOCATION_CODE = 44;
     public static final int ACCESS_FINE_LOCATION_CODE = 55;
 
+    public static final DialogUtil DIALOG_UTIL = new DialogUtil();
+
     private final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private final Map<String, BluetoothDeviceWrapper> bondDevices = new HashMap<>();
 
@@ -45,6 +48,9 @@ public class SelectDeviceActivity extends AppCompatActivity {
             GridLayout layout = findViewById(R.id.bondedDevicesLayout);
             LayoutInflater layoutInflater = getLayoutInflater();
             layout.removeAllViews();
+
+            if (deviceMap.isEmpty())
+                DIALOG_UTIL.infoDialog(SelectDeviceActivity.this, "У вас нет привязанных Bluetooth приборов").show();
 
             BluetoothDevice selectedDevice = App.selectedDevice;
             deviceMap.forEach((name, bluetoothDeviceWrapper) -> {
@@ -89,12 +95,18 @@ public class SelectDeviceActivity extends AppCompatActivity {
                 return;
             }
 
-            Toast.makeText(this, "Все необходимые разрешения у приложения есть", Toast.LENGTH_SHORT).show();
+            DIALOG_UTIL.infoDialog(this, "Все необходимые разрешения у приложения есть").show();
         });
 
+        findViewById(R.id.btSettingButton).setOnClickListener(v -> {
+            startActivity(new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS));
+        });
+
+        /*
         findViewById(R.id.searchButton).setOnClickListener(v -> {
             startActivity(new Intent(this, SearchDeviceActivity.class));
         });
+        */
 
         for (BluetoothDevice bondedDevice : bluetoothAdapter.getBondedDevices()) {
             bondDevices.put(bondedDevice.getAddress(), new BluetoothDeviceWrapper(bondedDevice, bondedDevice.getName()));
@@ -109,7 +121,7 @@ public class SelectDeviceActivity extends AppCompatActivity {
         Log.i("onRequestPermissionsResult", requestCode + ":  " + Arrays.toString(permissions) + ": " + Arrays.toString(grantResults));
         if (ACCESS_COARSE_LOCATION_CODE == requestCode || ACCESS_FINE_LOCATION_CODE == requestCode) {
             if (0 != grantResults[0])
-                Toast.makeText(this, "Все необходимые разрешения у приложения есть", Toast.LENGTH_SHORT).show();
+                DIALOG_UTIL.infoDialog(this, "Все необходимые разрешения у приложения есть").show();
         }
     }
 

@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ES {
+    public static final ExecutorService VIEW_EXECUTOR = Executors.newFixedThreadPool(2);
     public static final ExecutorService DEVICE_EXECUTOR = Executors.newFixedThreadPool(2);
 
     public static final Gson GSON = new Gson();

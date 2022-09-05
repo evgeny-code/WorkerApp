@@ -1,5 +1,6 @@
 package com.linksrussia.tsup.workerapp.util;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -17,6 +18,17 @@ import com.linksrussia.tsup.workerapp.db.dao.SeriesDao;
 import com.linksrussia.tsup.workerapp.db.entities.Series;
 
 public class DialogUtil {
+
+    public Dialog infoDialog(Activity activity, String msg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(msg)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        return builder.create();
+    }
 
     public Dialog onCreateNoDeviceForkDialog(MeasurementActivity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);

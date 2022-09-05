@@ -84,7 +84,9 @@ public class MeasurementActivity extends AppCompatActivity {
         dataReceiver = new DataReceiver(seriesId, renderCallback);
         registerReceiver(dataReceiver, new IntentFilter(DataReceiver.INTENT_ACTION));
 
-        renderCallback.accept(measureDao.getBySeries(seriesId));
+        ES.VIEW_EXECUTOR.submit(() -> {
+            renderCallback.accept(measureDao.getBySeries(seriesId));
+        });
 
         findViewById(R.id.fab).setOnClickListener(v -> {
             ShareUtil.sendData(MeasurementActivity.this, measureDao.getBySeries(seriesId));

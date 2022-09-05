@@ -19,7 +19,11 @@ import com.linksrussia.tsup.workerapp.db.dao.MeasureDao;
 import com.linksrussia.tsup.workerapp.db.dao.SeriesDao;
 import com.linksrussia.tsup.workerapp.db.entities.Series;
 import com.linksrussia.tsup.workerapp.util.DialogUtil;
+import com.linksrussia.tsup.workerapp.util.ES;
 import com.linksrussia.tsup.workerapp.util.ShareUtil;
+
+import java.util.List;
+import java.util.concurrent.Future;
 
 public class SeriesActivity extends AppCompatActivity {
     public static final DialogUtil DIALOG_UTIL = new DialogUtil();

@@ -76,6 +76,23 @@ public class SearchDeviceActivity extends AppCompatActivity {
         @SuppressLint("MissingPermission")
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
+            switch (callbackType) {
+                case ScanSettings.CALLBACK_TYPE_ALL_MATCHES:
+                    Log.d("callbackType", "Scanner: ALL_MATCHES");
+                    break;
+                case ScanSettings.CALLBACK_TYPE_FIRST_MATCH:
+                    Log.d("callbackType", "Scanner: FIRST_MATCH:");
+                    break;
+                case ScanSettings.CALLBACK_TYPE_MATCH_LOST:
+                    Log.d("callbackType", "Scanner: MATCH_LOST :");
+                    break;
+
+                default:
+                    Log.e("callbackType", "Scanner: Unknown callback type!");
+                    break;
+            }
+
+
             BluetoothDevice device = result.getDevice();
 
             String name = device.getName();
@@ -87,6 +104,15 @@ public class SearchDeviceActivity extends AppCompatActivity {
             Log.i("onScanResult device", name + ":  " + device.getAddress());
 
             renderDevices(findViewById(R.id.findDevicesLayout), findDevices);
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            super.onBatchScanResults(results);
+            for (ScanResult scanResult : results) {
+                onScanResult(0, scanResult);
+            }
+
         }
     };
 
@@ -100,6 +126,7 @@ public class SearchDeviceActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             List<ScanFilter> scanFilters = new ArrayList<>();
+
             ScanSettings scanSettings = new ScanSettings.Builder()
                     .setReportDelay(0)
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)

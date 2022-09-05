@@ -32,9 +32,11 @@
         <activity
             android:name=".activities.MeasurementActivity"
             android:exported="false" />
+        <!--
         <activity
             android:name=".activities.SearchDeviceActivity"
             android:exported="false" />
+            -->
         <activity
             android:name=".activities.SeriesActivity"
             android:exported="false" />
