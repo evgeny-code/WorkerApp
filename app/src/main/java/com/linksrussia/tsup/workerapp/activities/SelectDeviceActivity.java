@@ -108,6 +108,20 @@ public class SelectDeviceActivity extends AppCompatActivity {
         });
         */
 
+        renderBonded();
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        renderBonded();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void renderBonded() {
+        bondDevices.clear();
+
         for (BluetoothDevice bondedDevice : bluetoothAdapter.getBondedDevices()) {
             bondDevices.put(bondedDevice.getAddress(), new BluetoothDeviceWrapper(bondedDevice, bondedDevice.getName()));
         }
