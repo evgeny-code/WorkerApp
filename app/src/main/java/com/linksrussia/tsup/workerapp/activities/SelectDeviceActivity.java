@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,7 +35,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class SelectDeviceActivity extends AppCompatActivity {
-    public static final int ACCESS_COARSE_LOCATION_CODE = 44;
+    public static final int BLUETOOTH_SCAN_CODE = 22;
+    public static final int ACCESS_COARSE_LOCATION_CODE = 33;
+    public static final int BLUETOOTH_CONNECT_CODE = 44;
     public static final int ACCESS_FINE_LOCATION_CODE = 55;
 
     public static final DialogUtil DIALOG_UTIL = new DialogUtil();
@@ -87,6 +90,16 @@ public class SelectDeviceActivity extends AppCompatActivity {
         registerReceiver(deviceReceiver, new IntentFilter(DeviceReceiver.INTENT_ACTION));
 
         findViewById(R.id.checkButton).setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.BLUETOOTH_SCAN, BLUETOOTH_SCAN_CODE)) {
+                    return;
+                }
+
+                if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.BLUETOOTH_CONNECT, BLUETOOTH_CONNECT_CODE)) {
+                    return;
+                }
+            }
+
             if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.ACCESS_COARSE_LOCATION, ACCESS_COARSE_LOCATION_CODE)) {
                 return;
             }
