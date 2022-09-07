@@ -1,7 +1,6 @@
 package com.linksrussia.tsup.workerapp.util;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -26,9 +25,9 @@ public class ShareUtil {
         StringBuffer csvBuffer = new StringBuffer();
 
         csvBuffer.append("ID;");
-        csvBuffer.append("Date & Time;");
-        csvBuffer.append("Elevation (mm);");
-        csvBuffer.append("Distance (mm);");
+        csvBuffer.append("Дата и время;");
+        csvBuffer.append("Возвышение (mm);");
+        csvBuffer.append("Расстояние (mm)");
         csvBuffer.append('\n');
 
         for (Measure measure : measures) {
@@ -42,7 +41,6 @@ public class ShareUtil {
             csvBuffer.append(';');
 
             csvBuffer.append(measure.gj);
-            csvBuffer.append(';');
 
             csvBuffer.append('\n');
         }
@@ -51,7 +49,7 @@ public class ShareUtil {
         File outputDir = activity.getCacheDir(); // context being the Activity pointer
         try {
             File outputFile = File.createTempFile("measure-data-", ".csv", outputDir);
-            writeToFile(outputFile, csvBuffer.toString(), activity);
+            writeToFile(outputFile, csvBuffer.toString());
 
             Uri uri = FileProvider.getUriForFile(
                     activity,
@@ -70,9 +68,10 @@ public class ShareUtil {
         }
     }
 
-    private static void writeToFile(File outputFile, String data, Context context) {
+    private static void writeToFile(File outputFile, String data) {
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(outputFile));
+            outputStreamWriter.write("\ufeff");
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         } catch (IOException e) {
