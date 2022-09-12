@@ -24,14 +24,15 @@ public class ShareUtil {
     public static void sendData(Activity activity, List<Measure> measures) {
         StringBuffer csvBuffer = new StringBuffer();
 
-        csvBuffer.append("ID;");
+        csvBuffer.append("№;");
         csvBuffer.append("Дата и время;");
         csvBuffer.append("Возвышение (mm);");
         csvBuffer.append("Расстояние (mm)");
         csvBuffer.append('\n');
 
+        int counter = 1;
         for (Measure measure : measures) {
-            csvBuffer.append(measure.id);
+            csvBuffer.append(counter++);
             csvBuffer.append(';');
 
             csvBuffer.append(dateFormat.format(new Date(measure.timeMills)));
