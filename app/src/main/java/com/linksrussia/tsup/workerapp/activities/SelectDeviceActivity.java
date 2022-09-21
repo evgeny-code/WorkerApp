@@ -1,13 +1,16 @@
 package com.linksrussia.tsup.workerapp.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,21 +91,32 @@ public class SelectDeviceActivity extends AppCompatActivity {
         registerReceiver(deviceReceiver, new IntentFilter(DeviceReceiver.INTENT_ACTION));
 
         findViewById(R.id.checkButton).setOnClickListener(v -> {
+            boolean isOk = true;
             if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.ACCESS_COARSE_LOCATION, ACCESS_COARSE_LOCATION_CODE)) {
-                return;
+                isOk = false;
             }
 
             if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE)) {
-                return;
+                isOk = false;
             }
 
-            DIALOG_UTIL.infoDialog(this, "Все необходимые разрешения у приложения есть").show();
+            if (isOk) {
+                DIALOG_UTIL.infoDialog(this, "Все необходимые разрешения у приложения есть").show();
+            } else {
+                DIALOG_UTIL.infoDialog(this, "Для работы приложения нужен доступ к местоположению").show();
+            }
         });
 
         findViewById(R.id.btSettingButton).setOnClickListener(v -> {
             startActivity(new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS));
         });
 
+        findViewById(R.id.appSettingButton).setOnClickListener(v -> {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        });
         /*
         findViewById(R.id.searchButton).setOnClickListener(v -> {
             startActivity(new Intent(this, SearchDeviceActivity.class));
@@ -110,12 +124,17 @@ public class SelectDeviceActivity extends AppCompatActivity {
         */
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean isOk = true;
             if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.BLUETOOTH_SCAN, BLUETOOTH_SCAN_CODE)) {
-                return;
+                isOk = false;
             }
 
             if (!SelectDeviceActivity.this.checkOrRequest(Manifest.permission.BLUETOOTH_CONNECT, BLUETOOTH_CONNECT_CODE)) {
-                return;
+                isOk = false;
+            }
+
+            if (!isOk) {
+                DIALOG_UTIL.infoDialog(this, "Для работы приложения нужен доступ к BLUETOOTH").show();
             }
         }
 
@@ -130,13 +149,9 @@ public class SelectDeviceActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("MissingPermission")
     private void renderBonded() {
         bondDevices.clear();
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(SelectDeviceActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, BLUETOOTH_CONNECT_CODE);
-            return;
-        }
 
         for (BluetoothDevice bondedDevice : bluetoothAdapter.getBondedDevices()) {
             bondDevices.put(bondedDevice.getAddress(), new BluetoothDeviceWrapper(bondedDevice, bondedDevice.getName()));
@@ -149,10 +164,10 @@ public class SelectDeviceActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.i("onRequestPermissionsResult", requestCode + ":  " + Arrays.toString(permissions) + ": " + Arrays.toString(grantResults));
-        if (ACCESS_COARSE_LOCATION_CODE == requestCode || ACCESS_FINE_LOCATION_CODE == requestCode) {
-            if (0 != grantResults[0])
+        /*if (ACCESS_COARSE_LOCATION_CODE == requestCode || ACCESS_FINE_LOCATION_CODE == requestCode) {
+            if (0 != grantResults.length && 0 != grantResults[0])
                 DIALOG_UTIL.infoDialog(this, "Все необходимые разрешения у приложения есть").show();
-        }
+        }*/
     }
 
     @Override
