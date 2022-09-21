@@ -17,8 +17,8 @@ public class DataParser {
     private boolean readingGJ = false;
     private boolean readingCG = false;
 
-    private int gj;
-    private int cg;
+    private double gj;
+    private double cg;
 
     public void putData(String part) {
         for (char c : part.toCharArray()) {
@@ -39,10 +39,10 @@ public class DataParser {
 
             if (readingGJ && ',' == c) {
                 try {
-                    gj = Integer.parseInt(numberBuffer.toString().trim());
+                    gj = Double.parseDouble(numberBuffer.toString().trim());
                 } catch (NumberFormatException nfe) {
                     Log.e("Parser", "NumberFormatException", nfe);
-                    gj = Integer.MIN_VALUE;
+                    gj = Double.MIN_VALUE;
                 }
 
                 numberBuffer.delete(0, numberBuffer.length());
@@ -50,10 +50,10 @@ public class DataParser {
             }
             if (readingCG && 'G' == c) {
                 try {
-                    cg = Integer.parseInt(numberBuffer.toString().trim());
+                    cg = Double.parseDouble(numberBuffer.toString().trim());
                 } catch (NumberFormatException nfe) {
                     Log.e("Parser", "NumberFormatException", nfe);
-                    cg = Integer.MIN_VALUE;
+                    cg = Double.MIN_VALUE;
                 }
 
                 numberBuffer.delete(0, numberBuffer.length());
@@ -77,14 +77,14 @@ public class DataParser {
     public void tryToGrabRemainder() {
         String remainder = mainBuffer.toString();
         if (remainder.contains("GJ:") && remainder.contains("CG:")) {
-            int gj = 0;
-            int cg = 0;
+            double gj = 0;
+            double cg = 0;
             for (String part : remainder.split(",")) {
                 part = part.trim();
                 if (part.contains("GJ:")) {
-                    gj = Integer.parseInt(part.substring(3).trim());
+                    gj = Double.parseDouble(part.substring(3).trim());
                 } else if (part.contains("CG:")) {
-                    cg = Integer.parseInt(part.substring(3).trim());
+                    cg = Double.parseDouble(part.substring(3).trim());
                 }
             }
             dataBuffer.add(new DeviceData(gj, cg));

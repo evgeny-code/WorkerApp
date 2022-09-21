@@ -1,19 +1,19 @@
 package com.linksrussia.tsup.workerapp.dto;
 
 public class DeviceData {
-    private final int GJ;
-    private final int CG;
+    private final double GJ;
+    private final double CG;
 
-    public DeviceData(int GJ, int CG) {
+    public DeviceData(double GJ, double CG) {
         this.GJ = GJ;
         this.CG = CG;
     }
 
-    public int getGJ() {
+    public double getGJ() {
         return GJ;
     }
 
-    public int getCG() {
+    public double getCG() {
         return CG;
     }
 

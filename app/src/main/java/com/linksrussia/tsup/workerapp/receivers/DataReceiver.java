@@ -33,8 +33,8 @@ public class DataReceiver extends BroadcastReceiver {
         DeviceData deviceData = ES.GSON.fromJson(intent.getStringExtra(DATA_EXTRA), DeviceData.class);
 
         Measure measure = new Measure();
-        measure.gj = Double.valueOf(deviceData.getGJ());
-        measure.cg = Double.valueOf(deviceData.getCG());
+        measure.gj = deviceData.getGJ();
+        measure.cg = deviceData.getCG();
         measure.timeMills = new Date().getTime();
         measure.seriesId = currentSeriesId;
         measureDao.insertAll(measure);
