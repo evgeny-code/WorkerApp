@@ -19,9 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ES {
-    public static final ExecutorService VIEW_EXECUTOR = Executors.newFixedThreadPool(2);
-    public static final ExecutorService DEVICE_EXECUTOR = Executors.newFixedThreadPool(2);
-
     public static final Gson GSON = new Gson();
 
     public static final DataParser DATA_PARSER = new DataParser();
@@ -33,8 +30,14 @@ public class ES {
         App.context.sendBroadcast(new Intent(InfoMessageReceiver.INTENT_ACTION).putExtra(InfoMessageReceiver.TEXT_EXTRA, text));
     }
 
+    private static ExecutorService DEVICE_EXECUTOR;
+
     public static void restartReceiveData() {
-        stopReceiveData();
+        if (null != DEVICE_EXECUTOR) {
+            Log.d("DEVICE_EXECUTOR", "shutdown: " + DEVICE_EXECUTOR.shutdownNow());
+        }
+
+        DEVICE_EXECUTOR = Executors.newFixedThreadPool(2);
 
         BluetoothDevice selectedDevice = App.selectedDevice;
         ES.DEVICE_DATA_FUTURE = ES.DEVICE_EXECUTOR.submit(() -> {
@@ -53,7 +56,7 @@ public class ES {
                 try {
                     DeviceSessionWorker.receiveData(bluetoothSocket, data -> ES.DATA_PARSER.putData(data.trim()));
                 } catch (IOException e) {
-                    Log.e("DATA", "Can't receive data ", e);
+                    Log.e("DATA", "Can't receive data");
                 }
 
                 DeviceSessionWorker.closeSocket(bluetoothSocket);
@@ -79,24 +82,5 @@ public class ES {
                     break;
             }
         });
-    }
-
-    public static void stopReceiveData() {
-        if (null != ES.DEVICE_DATA_FUTURE)
-            ES.DEVICE_DATA_FUTURE.cancel(true);
-
-        if (null != ES.SAVE_DATA_FUTURE)
-            ES.SAVE_DATA_FUTURE.cancel(true);
-
-        // ждем пока потоки остановятся
-        while ((null != ES.DEVICE_DATA_FUTURE && !ES.DEVICE_DATA_FUTURE.isDone())
-                || (null != ES.SAVE_DATA_FUTURE && !ES.SAVE_DATA_FUTURE.isDone())) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Log.e("deviceWork", "Cant sleep on wait", e);
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 }

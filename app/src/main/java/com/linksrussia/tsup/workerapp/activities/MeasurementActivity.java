@@ -27,14 +27,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class MeasurementActivity extends AppCompatActivity {
-
     public static final String SERIES_ID = "MEASURE_ID";
     public static final String SERIES_NAME = "MEASURE_NAME";
 
     public static final DialogUtil DIALOG_UTIL = new DialogUtil();
+
+    private final ExecutorService VIEW_EXECUTOR = Executors.newFixedThreadPool(1);
 
     final MeasureDao measureDao = App.db.measureDao();
     final List<View> renderedRows = new ArrayList<>();
@@ -70,6 +73,8 @@ public class MeasurementActivity extends AppCompatActivity {
         }
     };
 
+
+
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +89,9 @@ public class MeasurementActivity extends AppCompatActivity {
         dataReceiver = new DataReceiver(seriesId, renderCallback);
         registerReceiver(dataReceiver, new IntentFilter(DataReceiver.INTENT_ACTION));
 
-        ES.VIEW_EXECUTOR.submit(() -> {
+
+
+        VIEW_EXECUTOR.submit(() -> {
             renderCallback.accept(measureDao.getBySeries(seriesId));
         });
 
@@ -108,7 +115,6 @@ public class MeasurementActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ES.stopReceiveData();
         if (null != dataReceiver)
             unregisterReceiver(dataReceiver);
     }

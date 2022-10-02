@@ -1,103 +1,78 @@
 package com.linksrussia.tsup.workerapp.util;
 
-import android.util.Log;
-
 import com.linksrussia.tsup.workerapp.dto.DeviceData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DataParser {
+    public static final Pattern OLD_DATA_PATTERN = Pattern.compile("GJ:-?[0-9]+,CG:-?[0-9]+");
+    public static final Pattern FULL_DATA_PATTERN = Pattern.compile("GJ:-?[0-9]+\\.[0-9]+,CG:-?[0-9]+\\.[0-9]+");
+
+    public static final String GJ_START = "GJ:";
+    public static final String CG_START = "CG:";
+
     private StringBuffer mainBuffer = new StringBuffer();
-    private StringBuffer numberBuffer = new StringBuffer();
 
     private List<DeviceData> dataBuffer = new ArrayList<>();
-    private boolean hasNewData = false;
 
-    private boolean readingGJ = false;
-    private boolean readingCG = false;
-
-    private double gj;
-    private double cg;
 
     public void putData(String part) {
-        for (char c : part.toCharArray()) {
-            mainBuffer.append(c);
+        mainBuffer.append(part);
 
-            if (3 > mainBuffer.length())
-                continue;
+        String dataLine = mainBuffer.toString().replaceAll(" ", "");
+        System.out.println(dataLine);
 
-            String token = mainBuffer.substring(mainBuffer.length() - 3);
-            if ("GJ:".equals(token)) {
-                readingGJ = true;
-                continue;
-            }
-            if ("CG:".equals(token)) {
-                readingCG = true;
-                continue;
-            }
+        String extracted = tryToExtract(dataLine);
 
-            if (readingGJ && ',' == c) {
-                try {
-                    gj = Double.parseDouble(numberBuffer.toString().trim());
-                } catch (NumberFormatException nfe) {
-                    Log.e("Parser", "NumberFormatException", nfe);
-                    gj = Double.MIN_VALUE;
+        if (null != extracted) {
+            System.out.println("RES = " + extracted);
+
+            String[] parts = extracted.split(",");
+            if (2 == parts.length) {
+                double gj = 0.0;
+                double cg = 0.0;
+
+                if (parts[0].startsWith(GJ_START)) {
+                    gj = Double.parseDouble(parts[0].substring(GJ_START.length()));
                 }
 
-                numberBuffer.delete(0, numberBuffer.length());
-                readingGJ = false;
-            }
-            if (readingCG && 'G' == c) {
-                try {
-                    cg = Double.parseDouble(numberBuffer.toString().trim());
-                } catch (NumberFormatException nfe) {
-                    Log.e("Parser", "NumberFormatException", nfe);
-                    cg = Double.MIN_VALUE;
+                if (parts[1].startsWith(CG_START)) {
+                    cg = Double.parseDouble(parts[1].substring(CG_START.length()));
                 }
-
-                numberBuffer.delete(0, numberBuffer.length());
-                readingCG = false;
 
                 dataBuffer.add(new DeviceData(gj, cg));
-                hasNewData = true;
-                mainBuffer.delete(0, mainBuffer.length() - 1);
-                readingGJ = false;
-                readingCG = false;
             }
 
-            if (readingCG || readingGJ) {
-                numberBuffer.append(c);
-            }
+            mainBuffer = new StringBuffer();
         }
 
-        tryToGrabRemainder();
-    }
+        // на случай если какая то ошибка и накопилось много хлама
+        if (32 < dataLine.length()) {
+            String[] parts = dataLine.split("[0-9\\-\\.]+");
+            String lastPart = parts[parts.length - 1];
 
-    public void tryToGrabRemainder() {
-        String remainder = mainBuffer.toString();
-        if (remainder.contains("GJ:") && remainder.contains("CG:")) {
-            double gj = 0;
-            double cg = 0;
-            for (String part : remainder.split(",")) {
-                part = part.trim();
-                if (part.contains("GJ:")) {
-                    gj = Double.parseDouble(part.substring(3).trim());
-                } else if (part.contains("CG:")) {
-                    cg = Double.parseDouble(part.substring(3).trim());
-                }
-            }
-            dataBuffer.add(new DeviceData(gj, cg));
-            hasNewData = true;
-
-            mainBuffer.delete(0, mainBuffer.length());
-            readingGJ = false;
-            readingCG = false;
+            mainBuffer = new StringBuffer();
+            // на сулчай если CG разобьет на C и G
+            if (!lastPart.startsWith(","))
+                mainBuffer.append(lastPart);
         }
     }
 
-    public boolean hasNewData() {
-        return hasNewData;
+    private String tryToExtract(String dataLine) {
+        Matcher oldMatcher = OLD_DATA_PATTERN.matcher(dataLine);
+        if (oldMatcher.find()) {
+            return oldMatcher.group(0);
+        }
+
+        Matcher matcher = FULL_DATA_PATTERN.matcher(dataLine);
+        if (matcher.find()) {
+            return matcher.group(0);
+        }
+
+        return null;
     }
 
     public synchronized List<DeviceData> getData() {
@@ -105,7 +80,10 @@ public class DataParser {
             return new ArrayList<>(dataBuffer);
         } finally {
             dataBuffer.clear();
-            hasNewData = false;
         }
+    }
+
+    public synchronized boolean hasNewData() {
+        return !dataBuffer.isEmpty();
     }
 }
